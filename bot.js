@@ -12,13 +12,11 @@ const CONFIG = {
     auth: 'offline'
   },
   behavior: {
-    jumpInterval: 1000, // Intervalo entre pulos (ms)
-    jumpDuration: 100,  // Duração do pulo (ms)
     reconnectDelay: 5000, // Delay padrão de reconexão (ms)
     serverOfflineDelay: 30000 // Delay quando servidor está offline (ms)
   },
   messages: {
-    joinMessage: 'Olá, eu sou o bot da Galinha Zumbi SMP! Eu mantenho este servidor ativo para vocês!',
+    joinMessage: 'Oi! Sou um bot mantendo o servidor vivo! 🤖',
     enableJoinMessage: true
   },
   logging: {
@@ -75,26 +73,14 @@ const Logger = {
 // ==================== GERENCIADOR DE ESTADO ====================
 const BotState = {
   bot: null,
-  jumpInterval: null,
   isReconnecting: false,
 
   setBot(newBot) {
     this.bot = newBot;
   },
 
-  setJumpInterval(interval) {
-    this.jumpInterval = interval;
-  },
-
   setReconnecting(status) {
     this.isReconnecting = status;
-  },
-
-  clearJumpInterval() {
-    if (this.jumpInterval) {
-      clearInterval(this.jumpInterval);
-      this.jumpInterval = null;
-    }
   },
 
   isConnected() {
@@ -117,38 +103,6 @@ const MessageFilter = {
 
 // ==================== COMPORTAMENTO DO BOT ====================
 const BotBehavior = {
-  startJumping() {
-    BotState.clearJumpInterval();
-
-    const interval = setInterval(() => {
-      this.attemptJump();
-    }, CONFIG.behavior.jumpInterval);
-
-    BotState.setJumpInterval(interval);
-    Logger.success('Sistema de pulos iniciado');
-  },
-
-  attemptJump() {
-    try {
-      if (BotState.isConnected() && BotState.bot.entity.onGround) {
-        BotState.bot.setControlState('jump', true);
-
-        setTimeout(() => {
-          if (BotState.bot) {
-            BotState.bot.setControlState('jump', false);
-          }
-        }, CONFIG.behavior.jumpDuration);
-      }
-    } catch (error) {
-      Logger.warning(`Falha ao executar pulo: ${error.message}`);
-    }
-  },
-
-  stopJumping() {
-    BotState.clearJumpInterval();
-    Logger.info('Sistema de pulos pausado');
-  },
-
   sendJoinMessage() {
     if (CONFIG.messages.enableJoinMessage) {
       BotState.bot.chat(CONFIG.messages.joinMessage);
@@ -195,9 +149,8 @@ const ConnectionManager = {
   },
 
   handleSpawn() {
-    Logger.success('Bot spawnou no mundo');
+    Logger.success('Bot spawnou no mundo - permanecendo parado');
     BotBehavior.sendJoinMessage();
-    BotBehavior.startJumping();
   },
 
   handleMessage(message) {
@@ -214,7 +167,6 @@ const ConnectionManager = {
 
   handleKick(reason) {
     Logger.error(`Bot foi expulso: ${reason}`);
-    BotBehavior.stopJumping();
     BotState.setReconnecting(false);
 
     this.scheduleReconnect(CONFIG.behavior.reconnectDelay);
@@ -222,7 +174,6 @@ const ConnectionManager = {
 
   handleError(error) {
     Logger.error(`Erro de conexão: ${error.message}`);
-    BotBehavior.stopJumping();
     BotState.setReconnecting(false);
 
     const isServerOffline = error.message.includes('ENOTFOUND') || 
@@ -242,7 +193,6 @@ const ConnectionManager = {
 
   handleDisconnect() {
     Logger.info('Bot desconectado');
-    BotBehavior.stopJumping();
     BotState.setReconnecting(false);
 
     this.scheduleReconnect(CONFIG.behavior.reconnectDelay);
@@ -257,7 +207,6 @@ const ConnectionManager = {
 
   shutdown() {
     Logger.info('Encerrando bot...');
-    BotBehavior.stopJumping();
 
     if (BotState.bot) {
       BotState.bot.quit();
@@ -272,5 +221,5 @@ process.on('SIGINT', () => ConnectionManager.shutdown());
 
 Logger.info('Bot Minecraft iniciado');
 Logger.info(`Versão: ${CONFIG.server.version}`);
-Logger.info(`Intervalo de pulos: ${CONFIG.behavior.jumpInterval}ms`);
+Logger.info('Modo: Permanece parado (ideal para modo espectador)');
 ConnectionManager.createBot();

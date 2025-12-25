@@ -4,12 +4,12 @@ Bot automatizado para manter servidor Minecraft ativo, evitando que feche por in
 
 ## Descrição
 
-Este bot conecta-se ao servidor Minecraft e permanece online, pulando periodicamente para simular atividade de jogador. Ideal para servidores que desligam automaticamente após período de inatividade (como Aternos).
+Este bot conecta-se ao servidor Minecraft e permanece online, mantendo o servidor ativo. O bot fica parado (ideal para modo espectador) e reconecta automaticamente em caso de desconexão. Ideal para servidores que desligam automaticamente após período de inatividade (como Aternos).
 
 ## Funcionalidades
 
 - Conexão automática ao servidor
-- Sistema de pulos infinitos (anti-AFK)
+- Permanece online mantendo o servidor ativo (ideal para modo espectador)
 - Reconexão automática em caso de desconexão
 - Sistema de logging profissional com cores e timestamps
 - Filtro inteligente de mensagens do chat
@@ -36,13 +36,11 @@ const CONFIG = {
     auth: 'offline'                   // offline = servidor cracked
   },
   behavior: {
-    jumpInterval: 1000,               // Intervalo entre pulos (ms)
-    jumpDuration: 100,                // Duração do pulo (ms)
     reconnectDelay: 5000,             // Delay de reconexão (ms)
     serverOfflineDelay: 30000         // Delay quando servidor offline (ms)
   },
   messages: {
-    joinMessage: 'Bot online!',       // Mensagem ao entrar
+    joinMessage: 'Oi! Sou um bot mantendo o servidor vivo! 🤖',  // Mensagem ao entrar
     enableJoinMessage: true           // Ativar/desativar mensagem
   },
   logging: {
@@ -62,8 +60,8 @@ const CONFIG = {
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/minecraft-bot.git
-cd minecraft-bot
+git clone https://github.com/felipe-allves/Bot-Minecraft-24-7---Anti-AFK.git
+cd Bot-Minecraft-24-7---Anti-AFK
 ```
 
 2. Instale as dependências:
@@ -108,10 +106,11 @@ O bot possui um sistema de logging colorido com diferentes níveis:
 
 ## Modo Espectador
 
-Recomenda-se colocar o bot no **modo espectador** no servidor para:
+O bot foi projetado para funcionar no **modo espectador**. Ele permanece parado após conectar, não realizando ações que possam interferir no gameplay. Recomenda-se colocar o bot no modo espectador no servidor para:
 - Não ocupar slot de jogador
 - Não interferir no gameplay
 - Economia de recursos do servidor
+- Manter o servidor ativo sem movimentação desnecessária
 
 ## Solução de Problemas
 
@@ -123,6 +122,7 @@ Recomenda-se colocar o bot no **modo espectador** no servidor para:
 ### Bot desconecta frequentemente
 - O bot possui reconexão automática
 - Verifique os logs para identificar o motivo das desconexões
+- Certifique-se de que a mensagem de entrada (`joinMessage`) não contém caracteres especiais que possam causar expulsão (como códigos de cor `§` ou emojis, dependendo do servidor)
 
 ### Spam de mensagens no console
 - Ajuste `showHealthMana: false` na configuração
